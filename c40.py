@@ -89,7 +89,7 @@ def scrape_c40_jobs():
     keywords = load_keywords()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, slow_mo=200)
+        browser = p.chromium.launch(headless=True)  # headless for GitHub Actions
         page = browser.new_page()
         
         print(f"🔍 Opening {CAREERS_URL}")
@@ -138,12 +138,14 @@ def scrape_c40_jobs():
             # Extract "How to Apply"
             how_to_apply = extract_how_to_apply(description)
 
+            # ✅ Fixed Excel-safe hyperlink string
+            excel_safe_title = title.replace('"', "''")
             jobs.append({
                 "Title": title,
                 "Description": description,
                 "How_To_Apply": how_to_apply,
                 "Matched_Vertical": matched_verticals,
-                "Clickable_Link": f'=HYPERLINK("{job_url}", "{title.replace(chr(34), "''")}")'
+                "Clickable_Link": f'=HYPERLINK("{job_url}", "{excel_safe_title}")'
             })
 
             job_page.close()

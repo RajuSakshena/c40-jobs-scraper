@@ -5,6 +5,9 @@ on:
     - cron: "0 3 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write   # 👈 allow pushing changes
+
 jobs:
   scrape:
     runs-on: ubuntu-latest

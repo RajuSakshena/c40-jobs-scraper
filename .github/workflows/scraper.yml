@@ -31,6 +31,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/c40_jobs.xlsx
+          git add output/ || echo "No output directory"
           git commit -m "Update jobs data [skip ci]" || echo "No changes to commit"
           git push

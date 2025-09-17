@@ -1,4 +1,4 @@
-name: Run C40 Scraper
+name: Run c40 Scraper
 
 on:
   schedule:

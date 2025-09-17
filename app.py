@@ -1,28 +1,30 @@
 import streamlit as st
 import pandas as pd
+import os
 
 st.set_page_config(page_title="C40 Jobs Scraper", layout="wide")
 
-st.title("🌍 C40 Jobs Scraper Results")
+st.title("🌍 C40 Jobs Scraper")
+st.write("This app shows the latest scraped job listings from C40.")
 
-# Load Excel from repo
-EXCEL_PATH = "output/c40_jobs.xlsx"
+# Path to Excel file
+excel_path = "output/c40_jobs.xlsx"
 
-try:
-    df = pd.read_excel(EXCEL_PATH)
+if os.path.exists(excel_path):
+    # Load Excel
+    df = pd.read_excel(excel_path)
 
-    st.success(f"Loaded {len(df)} jobs from {EXCEL_PATH}")
-
-    # Show data in an interactive table
+    # Show dataframe with search
+    st.subheader("Job Listings")
     st.dataframe(df, use_container_width=True)
 
-    # Download button
+    # Allow download as Excel
     st.download_button(
         label="📥 Download Excel",
-        data=open(EXCEL_PATH, "rb").read(),
+        data=open(excel_path, "rb").read(),
         file_name="c40_jobs.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
-except FileNotFoundError:
-    st.error("❌ No Excel file found. Please run the scraper workflow first.")
+else:
+    st.warning("⚠️ No job data found yet. Please wait for the scraper workflow to run.")

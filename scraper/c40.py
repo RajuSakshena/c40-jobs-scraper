@@ -8,11 +8,16 @@ from playwright.sync_api import sync_playwright
 from openpyxl import load_workbook
 from openpyxl.styles import Alignment
 
+# ======================================================
+# PATH SETUP (CRITICAL FOR GITHUB ACTIONS)
+# ======================================================
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 CAREERS_URL = "https://c40.bamboohr.com/careers"
 BASE_URL = "https://c40.bamboohr.com"
-KEYWORDS_FILE = "keywords.json"
 
-OUTPUT_DIR = "output"
+KEYWORDS_FILE = os.path.join(BASE_DIR, "keywords.json")
+OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 OUTPUT_FILE = "c40_jobs.xlsx"
 
 
@@ -47,6 +52,9 @@ def scrape_c40_jobs():
 
         soup = BeautifulSoup(page.content(), "html.parser")
 
+        # --------------------------------------------------
+        # JOB LISTING LINKS
+        # --------------------------------------------------
         job_links = []
         for a in soup.select("a[href^='/careers/']"):
             href = a.get("href")
@@ -57,6 +65,9 @@ def scrape_c40_jobs():
         job_links = list(dict.fromkeys(job_links))
         print(f"✅ Found {len(job_links)} job listings")
 
+        # --------------------------------------------------
+        # VISIT EACH JOB
+        # --------------------------------------------------
         for job_url, fallback_title in job_links:
             print(f"➡️ Visiting job page: {job_url}")
             page.goto(job_url, timeout=60000)
@@ -79,7 +90,7 @@ def scrape_c40_jobs():
 
             matched_vertical = match_verticals(title, description, keywords)
 
-            # Excel-safe hyperlink formula
+            # Excel-safe hyperlink
             excel_safe_title = title.replace('"', "''")
 
             jobs.append({
@@ -95,6 +106,9 @@ def scrape_c40_jobs():
         print("❌ No jobs extracted.")
         return
 
+    # --------------------------------------------------
+    # SAVE TO EXCEL
+    # --------------------------------------------------
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     df = pd.DataFrame(
@@ -105,7 +119,9 @@ def scrape_c40_jobs():
     excel_path = os.path.join(OUTPUT_DIR, OUTPUT_FILE)
     df.to_excel(excel_path, index=False, engine="openpyxl")
 
-    # ✅ Excel formatting
+    # --------------------------------------------------
+    # FORMAT EXCEL
+    # --------------------------------------------------
     wb = load_workbook(excel_path)
     ws = wb.active
 

@@ -31,6 +31,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "action@github.com"
-          git add output/c40_jobs.xlsx
+          git add scraper/output/c40_jobs.xlsx
           git commit -m "Auto-update C40 jobs" || echo "No changes"
           git push
